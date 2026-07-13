@@ -49,7 +49,12 @@ app = FastAPI(title="Panache Homes AI CRM API")
 # Configure CORS for Next.js dev server communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://10.66.162.211:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://panache-homes-ai-assistant.vercel.app",
+        "https://panache-homes-ai-assistant-9z767alq2.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
