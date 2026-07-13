@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  timeout: 120000, // 120-second timeout to handle slow Gemini free-tier responses
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api",
+  timeout: 120000,
   headers: {
     "Content-Type": "application/json",
   },
