@@ -1,0 +1,37 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# Environment Variables
+.env
+**/.env
+
+# Google Credentials
+credentials.json
+**/credentials.json
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# ==========================
+# Node.js / Next.js
+# ==========================
+node_modules/
+.next/
+out/
+dist/
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store

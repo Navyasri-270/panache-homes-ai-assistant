@@ -1,0 +1,32 @@
+{
+  "about_panache_homes": "Panache Homes helps international investors buy and manage Dubai property.",
+  "buying_fees": [
+    "4% Dubai Land Department Registration Fee",
+    "AED 3000 Oqood Fee for Off-Plan Purchases"
+  ],
+  "taxes": [
+    "No Annual Property Tax",
+    "No Capital Gains Tax",
+    "US citizens should consult their CPA regarding foreign asset reporting."
+  ],
+  "currency": [
+    "UAE Dirham is pegged to USD",
+    "Fixed Exchange Rate = 3.6725",
+    "USD investors carry no currency risk."
+  ],
+  "payment_plans": [
+    "Usually 10%–20% Booking Amount",
+    "Remaining amount through construction instalments",
+    "Final payment on handover."
+  ],
+  "rental_yield": [
+    "Usually between 6%–8%",
+    "Never guarantee returns."
+  ],
+  "golden_visa": [
+    "AED 2 Million property investment qualifies for UAE 10-Year Golden Visa."
+  ],
+  "remote_purchase": [
+    "Customers can complete the purchase remotely through Digital Signing, International Wire Transfer, and Power of Attorney."
+  ]
+}
