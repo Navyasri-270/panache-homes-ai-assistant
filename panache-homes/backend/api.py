@@ -269,6 +269,7 @@ def create_lead(payload: LeadPayload):
     
     # Sync to Google Sheets
     synced, message = sync_lead_to_sheets(lead_dict)
+    print("Google Sheets:", synced, message)
     if synced:
         database.update_lead_sync_status(lead_id, 1)
         
