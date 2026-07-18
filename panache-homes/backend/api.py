@@ -302,9 +302,11 @@ def login_endpoint(payload: LoginPayload):
         return {"access_token": token, "token_type": "bearer", "username": username}
     raise HTTPException(status_code=401, detail="Invalid administrator credentials.")
 
+from services.google_sheets import get_leads_from_sheets
+
 @app.get("/api/leads")
-def get_leads_list(admin: dict = Depends(get_current_admin)):
-    return database.get_all_leads()
+def get_leads_list():
+    return get_leads_from_sheets()
 
 @app.get("/api/leads/{lead_id}/pdf")
 def get_lead_pdf_endpoint(lead_id: int):

@@ -36,39 +36,34 @@ def get_sheets_client():
     sheet = client.open_by_url(sheet_url).sheet1
     return sheet
 
-def sync_lead_to_sheets(lead_data):
-    """
-    Appends lead_data to Google Sheets. Fallbacks to simulation if not configured.
-    """
+def get_leads_from_sheets():
     try:
         sheet = get_sheets_client()
-        
-        # Verify header exists, if not write header
-        headers = ["Timestamp", "Name", "Country", "Budget", "Payment Method", "Timeline", "Purpose", "Lead Grade", "Conversation Summary"]
-        try:
-            existing_headers = sheet.row_values(1)
-            if not existing_headers:
-                sheet.append_row(headers)
-        except Exception:
-            sheet.append_row(headers)
-            
-        from datetime import datetime
-        timestamp = lead_data.get("created_at") or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        name = f"{lead_data.get('first_name', '')} {lead_data.get('last_name', '')}".strip()
-        
-        row = [
-            timestamp,
-            name,
-            lead_data.get("country", ""),
-            lead_data.get("budget", ""),
-            lead_data.get("payment_method", ""),
-            lead_data.get("timeline", ""),
-            lead_data.get("purpose", ""),
-            lead_data.get("grade", ""),
-            lead_data.get("ai_summary", "")
-        ]
-        sheet.append_row(row)
-        return True, "Successfully synced to Google Sheets!"
+        records = sheet.get_all_records()
+
+        leads = []
+        for i, row in enumerate(records, start=1):
+            leads.append({
+                "id": i,
+                "created_at": row.get("Timestamp", ""),
+                "first_name": row.get("Name", ""),
+                "last_name": "",
+                "country": row.get("Country", ""),
+                "budget": row.get("Budget", ""),
+                "payment_method": row.get("Payment Method", ""),
+                "timeline": row.get("Timeline", ""),
+                "purpose": row.get("Purpose", ""),
+                "grade": row.get("Lead Grade", ""),
+                "ai_summary": row.get("Conversation Summary", ""),
+                "status": "New",
+                "synced_to_sheets": True
+            })
+
+        # Show newest first
+        leads.reverse()
+
+        return leads
+
     except Exception as e:
-        # Return friendly message for simulator fallback
-        return False, f"Simulation Sync: Lead captured locally. To write to active Sheets, configure Service Account credentials in the Settings panel. (Error: {str(e)})"
+        print("Google Sheets Read Error:", e)
+        return []
