@@ -120,21 +120,64 @@ def normalize_budget(budget_str):
         val = float(match.group(0)) * multiplier
         return str(int(val))
     return str(budget_str)
-
+    
 def normalize_timeline(timeline_str):
+    """
+    Normalizes user timeline while preserving the correct unit.
+    """
+
     if not timeline_str:
         return ""
-    clean = str(timeline_str).lower().strip()
-    if any(keyword in clean for keyword in ["immediate", "now", "asap", "this month", "ready"]):
+
+    text = timeline_str.lower().strip()
+
+    # Immediate
+    if re.search(r"\b(immediate|now|asap|today|right away)\b", text):
         return "Immediate"
-    elif "2" in clean or "two" in clean:
-        return "2 Months"
-    elif "3" in clean or "three" in clean:
-        return "3 Months"
-    elif "6" in clean or "six" in clean:
-        return "6 Months"
-    elif "1" in clean or "one" in clean or "year" in clean:
-        return "1 Year"
+
+    # Weeks
+    m = re.search(r"\b(\d+|one|two|three|four)\s+weeks?\b", text)
+    if m:
+        value = m.group(1).lower()
+        mapping = {
+            "one": "1",
+            "two": "2",
+            "three": "3",
+            "four": "4",
+        }
+        value = mapping.get(value, value)
+        return f"{value} Week" if value == "1" else f"{value} Weeks"
+
+    # Months
+    m = re.search(r"\b(\d+|one|two|three|six)\s+months?\b", text)
+    if m:
+        value = m.group(1).lower()
+        mapping = {
+            "one": "1",
+            "two": "2",
+            "three": "3",
+            "six": "6",
+        }
+        value = mapping.get(value, value)
+        return f"{value} Month" if value == "1" else f"{value} Months"
+
+    # Years
+    m = re.search(r"\b(\d+|one|two|three)\s+years?\b", text)
+    if m:
+        value = m.group(1).lower()
+        mapping = {
+            "one": "1",
+            "two": "2",
+            "three": "3",
+        }
+        value = mapping.get(value, value)
+        return f"{value} Year" if value == "1" else f"{value} Years"
+
+    # Flexible
+    if any(word in text for word in ["flexible", "later", "not sure", "exploring"]):
+        return "Flexible"
+
+    # Default
     return timeline_str.title()
 
 def normalize_purpose(purpose_str):

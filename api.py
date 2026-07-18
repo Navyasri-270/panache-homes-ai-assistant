@@ -198,7 +198,7 @@ def create_lead(payload: LeadPayload):
 
 @app.get("/api/leads")
 def get_leads_list():
-    return database.get_all_leads()
+    return get_leads_from_sheets()
 
 @app.post("/api/leads/status")
 def update_status(payload: StatusPayload):
