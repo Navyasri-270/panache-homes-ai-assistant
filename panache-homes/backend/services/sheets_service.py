@@ -35,4 +35,30 @@ def get_sheets_client():
     client = gspread.authorize(creds)
     sheet = client.open_by_url(sheet_url).sheet1
     return sheet
+def sync_lead_to_sheets(lead):
+    """
+    Writes a completed lead to Google Sheets.
+    Returns (success, message).
+    """
+    try:
+        sheet = get_sheets_client()
+
+        sheet.append_row([
+            lead.get("full_name", ""),
+            lead.get("country", ""),
+            lead.get("budget", ""),
+            lead.get("payment_method", ""),
+            lead.get("timeline", ""),
+            lead.get("purpose", ""),
+            lead.get("grade", ""),
+            lead.get("ai_summary", ""),
+        ])
+
+        return True, "Lead successfully synced to Google Sheets."
+
+    except Exception as e:
+        return (
+            False,
+            f"Simulation Sync: Lead captured locally. To write to active Sheets, configure Service Account credentials in the Settings panel. (Error: {str(e)})",
+        )
 
