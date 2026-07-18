@@ -36,39 +36,3 @@ def get_sheets_client():
     sheet = client.open_by_url(sheet_url).sheet1
     return sheet
 
-def get_leads_from_sheets():
-    try:
-        sheet = get_sheets_client()
-        records = sheet.get_all_records()
-
-        leads = []
-
-        for i, row in enumerate(records, start=1):
-            name = row.get("Name", "")
-            first_name = name.split(" ")[0] if name else ""
-            last_name = " ".join(name.split(" ")[1:]) if len(name.split()) > 1 else ""
-
-            leads.append({
-                "id": i,
-                "first_name": first_name,
-                "last_name": last_name,
-                "email": "",
-                "country": row.get("Country", ""),
-                "budget": row.get("Budget", ""),
-                "payment_method": row.get("Payment Method", ""),
-                "timeline": row.get("Timeline", ""),
-                "purpose": row.get("Purpose", ""),
-                "grade": row.get("Lead Grade", ""),
-                "ai_summary": row.get("Conversation Summary", ""),
-                "created_at": row.get("Timestamp", ""),
-                "status": "New",
-                "synced_to_sheets": True
-            })
-
-        leads.reverse()
-        return leads
-
-    except Exception as e:
-        print("Google Sheets Read Error:", e)
-        return []
-    
