@@ -3,6 +3,7 @@ import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from database import get_config
+from datetime import datetime
 
 def get_sheets_client():
     creds_json = (
@@ -48,9 +49,8 @@ def sync_lead_to_sheets(lead):
     """
     try:
         sheet = get_sheets_client()
-
         sheet.append_row([
-            lead.get("full_name", ""),
+            f"{lead.get('first_name', '')} {lead.get('last_name', '')}".strip(),
             lead.get("country", ""),
             lead.get("budget", ""),
             lead.get("payment_method", ""),
@@ -58,7 +58,9 @@ def sync_lead_to_sheets(lead):
             lead.get("purpose", ""),
             lead.get("grade", ""),
             lead.get("ai_summary", ""),
-        ])
+            lead.get("generated_email", ""),
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ])
 
         return True, "Lead successfully synced to Google Sheets."
 
