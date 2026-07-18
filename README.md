@@ -276,62 +276,40 @@ PDF Advisory Report
 
 ---
 
-# 📊 API Endpoints
+## Installation & How to Run
 
-| Endpoint | Method |
-|------------|----------|
-| /api/chat | POST |
-| /api/leads | GET |
-| /api/leads | POST |
-| /api/login | POST |
-| /api/google-sync | POST |
-| /api/leads/{id}/pdf | GET |
-| /api/health | GET |
-
----
-
-# 🚀 Installation
-
-Clone repository
-
-```bash
-git clone https://github.com/Navyasri-270/panache-homes-ai-assistant.git
-```
-
-Backend
-
-```bash
-cd panache-homes/backend
-
-pip install -r requirements.txt
-
-uvicorn api:app --reload
-```
-
-Frontend
-
-```bash
-cd panache-homes/frontend
-
-npm install
-
-npm run dev
-```
+1. Clone or copy this repository to your workspace.
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Set your Google Gemini API key:
+   - On Windows (PowerShell):
+     ```powershell
+     $env:GEMINI_API_KEY="your-gemini-api-key"
+     ```
+   - On Linux/macOS:
+     ```bash
+     export GEMINI_API_KEY="your-gemini-api-key"
+     ```
+4. Start the Streamlit application:
+   ```bash
+   streamlit run app.py
+   ```
+5. Open your browser and navigate to `http://localhost:8501`.
 
 ---
 
-# 👩‍💻 Author
-
-**Navya Sri**
-
-B.Tech Computer Science
-
-GitHub
-
-https://github.com/Navyasri-270
+## Google Sheets Integration Setup
+The Google Sheets integration connects automatically using your Google Cloud Service Account.
+1. Place your Google Sheets Service Account credentials JSON file in the project directory named `credentials.json` (or set the file path in app settings).
+2. Share your destination Google Sheet with the client email listed in the credentials JSON.
+3. The system will automatically detect the spreadsheet and sync qualified leads.
 
 ---
 
-# ⭐ Acknowledgements
-
-Built as an AI-powered CRM solution for luxury real estate lead qualification using modern full-stack technologies and Google Gemini AI.
+## Project Walkthrough & Personas
+You can test the system using the pre-programmed client personas:
+- **Michael (USA - Grade A)**: Budget of AED 2.5M, remote buyer, cash payment, looking to close in 1-3 months.
+- **Priya (India - Grade B)**: Budget of AED 1.2M, buying a primary residence, using a bank mortgage, looking to buy in 3-6 months.
+- **Sara (UK - Grade C)**: Budget of AED 800k, looking for high-yield holiday apartments.

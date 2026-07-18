@@ -1,5 +1,7 @@
 import os
 import json
+import profile
+import profile
 import re
 import google.generativeai as genai
 from database import get_config
@@ -173,19 +175,52 @@ def parse_name(user_messages, user_text):
 
 def parse_country(text):
     text_lower = text.lower()
-    clean_text = re.sub(r"[^\w\s]", " ", text_lower)
-    words = clean_text.split()
-    if "india" in words:
-        return "India"
-    if "texas" in words or "us" in words or "usa" in words or "united states" in text_lower or "america" in text_lower:
-        return "US"
-    if "london" in words or "uk" in words or "united kingdom" in text_lower or "britain" in text_lower:
-        return "UK"
-    country_match = re.search(r"(?:from|in|live in|reside in) ([a-zA-Z\s]{3,20})", text, re.IGNORECASE)
-    if country_match:
-        candidate = country_match.group(1).strip().title()
-        if not any(k in candidate.lower() for k in ["cash", "mortgage", "ready", "immediate", "dubai", "invest", "personal"]):
-            return candidate
+
+    countries = {
+        "india": "India",
+        "uae": "United Arab Emirates",
+        "united arab emirates": "United Arab Emirates",
+        "usa": "United States",
+        "us": "United States",
+        "united states": "United States",
+        "america": "United States",
+        "uk": "United Kingdom",
+        "united kingdom": "United Kingdom",
+        "britain": "United Kingdom",
+        "england": "United Kingdom",
+        "canada": "Canada",
+        "australia": "Australia",
+        "germany": "Germany",
+        "france": "France",
+        "italy": "Italy",
+        "singapore": "Singapore",
+        "malaysia": "Malaysia",
+        "saudi arabia": "Saudi Arabia",
+        "qatar": "Qatar",
+        "kuwait": "Kuwait",
+        "oman": "Oman",
+        "bahrain": "Bahrain",
+        "pakistan": "Pakistan",
+        "bangladesh": "Bangladesh",
+        "nepal": "Nepal",
+        "sri lanka": "Sri Lanka",
+        "china": "China",
+        "japan": "Japan"
+    }
+
+    for key, value in countries.items():
+        if key in text_lower:
+            return value
+
+    match = re.search(
+        r"(?:from|live in|living in|reside in|based in)\s+([A-Za-z ]+)",
+        text,
+        re.IGNORECASE
+    )
+
+    if match:
+        return match.group(1).strip().title()
+
     return ""
 
 def parse_budget(text):
@@ -503,36 +538,57 @@ def extract_lead_profile(chat_history):
     if parsed_c:
         profile["country"] = parsed_c
 
-    # Budget heuristics
+        # Budget heuristics
     parsed_b = parse_budget(user_text)
     if parsed_b:
         profile["budget"] = parsed_b
-            
+
+    # Payment Method heuristics
+    text = user_text.lower()
+    if "cash" in text:
+        profile["payment_method"] = "Cash"
+    elif any(x in text for x in ["mortgage", "loan", "finance"]):
+        profile["payment_method"] = "Mortgage"
+
     # Timeline heuristics
     for msg in user_messages:
         msg_clean = msg.lower()
-        if "immediate" in msg_clean or "now" in msg_clean or "asap" in msg_clean or "right away" in msg_clean:
-            profile["timeline"] = "Immediate"
+        if any(x in msg_clean for x in ["immediate","now","asap","right away","today"]):
+            profile["timeline"]="Immediate"
             break
-        elif "month" in msg_clean or "flexible" in msg_clean or "later" in msg_clean:
-            profile["timeline"] = normalize_timeline(msg_clean)
+        elif any(x in msg_clean for x in ["next month","1 month","one month"]):
+            profile["timeline"]="1 Month"
+            break
+        elif any(x in msg_clean for x in ["2 month","two month"]):
+            profile["timeline"]="2 Months"
+            break
+        elif any(x in msg_clean for x in ["3 month","three month"]):
+            profile["timeline"]="3 Months"
+            break
+        elif any(x in msg_clean for x in ["6 month","six month"]):
+            profile["timeline"]="6 Months"
+            break
+        elif any(x in msg_clean for x in ["year","1 year","one year"]):
+            profile["timeline"]="1 Year"
+            break
+        elif any(x in msg_clean for x in ["later","flexible","exploring","not sure"]):
+            profile["timeline"]="Flexible"
             break
 
     if not profile["timeline"]:
-        timeline_match = re.search(r"(immediate|now|asap|\d ?month|year)", user_text, re.IGNORECASE)
+        timeline_match = re.search(r"(immediate|now|asap|today|1 month|2 month|3 month|6 month|year)", user_text, re.IGNORECASE)
         if timeline_match:
             profile["timeline"] = normalize_timeline(timeline_match.group(0))
 
     # Purpose heuristics
     for msg in user_messages:
         msg_clean = msg.lower()
-        if "invest" in msg_clean or "roi" in msg_clean or "yield" in msg_clean or "rent" in msg_clean:
-            profile["purpose"] = "Investment"
+        if any(x in msg_clean for x in ["invest","investment","roi","yield","rent","rental income","returns"]):
+            profile["purpose"]="Investment"
             break
-        elif "personal" in msg_clean or "family" in msg_clean or "own use" in msg_clean or "live in it" in msg_clean or "for myself" in msg_clean or "holiday home" in msg_clean:
-            profile["purpose"] = "Personal Use"
+        elif any(x in msg_clean for x in ["personal","personal use","family","own use","self use","live","living","residence","for myself","holiday home"]):
+            profile["purpose"]="Personal Use"
             break
-
 
     # Properties
     if "villa" in all_text.lower():
