@@ -93,10 +93,10 @@ def sync_lead_to_sheets(lead_data):
             sheet.append_row(headers)
 
         from datetime import datetime
-
+        from zoneinfo import ZoneInfo
         timestamp = (
             lead_data.get("created_at")
-            or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            or datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S")
         )
 
         full_name = (

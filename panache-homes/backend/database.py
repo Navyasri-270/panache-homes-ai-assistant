@@ -1,6 +1,7 @@
 import sqlite3
 import json
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 DB_FILE = "panache_leads.db"
 
@@ -46,17 +47,37 @@ def init_db():
 def save_lead(lead_data):
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
+
+    # Store timestamp in IST
+    created_at = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S")
+
     c.execute('''
         INSERT INTO leads (
-            first_name, last_name, email, phone, company, country, 
-            budget, property_interest, payment_method, timeline, purpose, score, grade, status, 
-            notes, ai_summary, generated_email, chat_transcript
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            first_name,
+            last_name,
+            email,
+            phone,
+            company,
+            country,
+            budget,
+            property_interest,
+            payment_method,
+            timeline,
+            purpose,
+            score,
+            grade,
+            status,
+            notes,
+            ai_summary,
+            generated_email,
+            chat_transcript,
+            created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        lead_data.get('first_name'),
-        lead_data.get('last_name'),
-        lead_data.get('email'),
-        lead_data.get('phone'),
+        lead_data.get('first_name', ''),
+        lead_data.get('last_name', ''),
+        lead_data.get('email', ''),
+        lead_data.get('phone', ''),
         lead_data.get('company', ''),
         lead_data.get('country', ''),
         lead_data.get('budget', ''),
@@ -70,7 +91,8 @@ def save_lead(lead_data):
         lead_data.get('notes', ''),
         lead_data.get('ai_summary', ''),
         lead_data.get('generated_email', ''),
-        json.dumps(lead_data.get('chat_transcript', []))
+        json.dumps(lead_data.get('chat_transcript', [])),
+        created_at
     ))
 
     lead_id = c.lastrowid
