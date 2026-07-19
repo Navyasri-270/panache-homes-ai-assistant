@@ -10,6 +10,7 @@ from jose import jwt, JWTError
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from services.sheets_service import (sync_lead_to_sheets,get_sheets_client,)
 
 
 # JWT Configurations
@@ -336,29 +337,25 @@ def update_status(payload: StatusPayload, admin: dict = Depends(get_current_admi
 
 @app.get("/api/sheets/status")
 def get_sheets_status(admin: dict = Depends(get_current_admin)):
-    creds = database.get_config("google_sheets_creds")
-    url = database.get_config("google_sheets_url")
-    
-    if not creds:
-        creds_path = os.getenv("GOOGLE_CREDENTIALS_PATH", "credentials.json")
-        if os.path.exists(creds_path):
-            try:
-                with open(creds_path, "r") as f:
-                    creds = f.read()
-            except Exception:
-                pass
-                
-    if not url:
-        sheet_id = os.getenv("GOOGLE_SHEETS_ID")
-        if sheet_id:
-            url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
-        else:
-            url = os.getenv("GOOGLE_SHEETS_URL")
-            
-    return {
-        "configured": bool(creds and url),
-        "url": url
-    }
+    try:
+        # Reuse the same logic used for syncing
+        sheet = get_sheets_client()
+
+        # Simple call to verify access
+        sheet.title
+
+        return {
+            "configured": True,
+            "connected": True,
+            "url": sheet.spreadsheet.url
+        }
+
+    except Exception as e:
+        return {
+            "configured": False,
+            "connected": False,
+            "error": str(e)
+        }
 
 @app.post("/api/settings")
 def update_settings(payload: Dict[str, str], admin: dict = Depends(get_current_admin)):
